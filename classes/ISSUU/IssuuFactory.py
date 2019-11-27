@@ -7,6 +7,7 @@ import inspect
 #local file imports
 from classes.abstract.AbstractFactory import AbstractFactory
 from classes.exception.NotFoundFileException import NotFoundFileException
+from classes.exception.IncorrectInputDataException import IncorrectInputDataException
 from classes.test.UnitTest import UnitTest
 from classes.ISSUU.IssuuDataset import IssuuDataset
 
@@ -15,16 +16,31 @@ class IssuuFactory(AbstractFactory):
     def __init__(self):
         super().__init__()
 
-    def load_dataset(self, path):
+    def _load_dataset_from_file(self, path):
+        """Private method that loads a dataset from a .json file according to the Issuu format"""
         if (path != None and os.path.exists(path)):
-            a = 0
-            print(os.path.exists(path))
+            f_content = open(path, "r").read()
+            return IssuuDataset(f_content)
         else:
             raise NotFoundFileException()
 
         return IssuuDataset(None)
 
-    
+
+    def _load_dataset_from_string(self, string):
+        """Private method that loads a dataset from a string according to the Issuu Format"""
+        assert(type(string)==str)
+        if (string == None):
+            return IssuuDataset(string)
+        else:
+            raise IncorrectInputDataException()
+
+    def load_dataset(self, path=None, content=None):
+        """Public method that loads a dataset from either a string or a filepath"""
+        if (path is not None):
+            return self._load_dataset_from_file(path)
+        else:
+            return self._load_dataset_from_string(content)   
 
     class Test(UnitTest):
         factory = IssuuFactory()
@@ -43,11 +59,20 @@ class IssuuFactory(AbstractFactory):
             # Generates a random name of size 10
             random_name = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])+".json"
             try:
-                factory.load_dataset(random_name)
+                factory.load_dataset(path=random_name)
             except:
                 has_exception = True
             UnitTest.affirm(has_exception)
         
+        def test_load_dataset_from_string(self):
+            """Tests the load of a dataset from a faulty string"""
+            random_content = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
+            try:
+                factory.load_dataset_from_file(content=random_content)
+            except:
+                has_exception = True
+
+            UnitTest.affirm(has_exception)
         # def test_load_dataset_check_size(self):
         #     """Tests the file has been correctly loaded"""
         #     print("IssuuFactory.load_dataset_check_size")

@@ -1,44 +1,17 @@
 # libraries import
-import pandas as pd
-import inspect
-import re
 
 # local files import
+from classes.abstract.AbstractOperator import AbstractOperator
 from classes.test.UnitTest import UnitTest
-from classes.abstract.AbstractDataset import AbstractDataset
-from classes.exception.IncorrectInputDataException import IncorrectInputDataException
 
-class IssuuDataset(AbstractDataset):
-    """This class holds the data of an Issuu-syntaxed dataset"""
+class IssuuOperator(AbstractOperator):
+
     def __init__(self, data):
-        """data is expected to be a string"""
-        assert(type(data) == str)
-
-        #Regular expression to transform the data as a list of json 
-        l = re.findall(r"{(.*)}"
-                ,data)
-        if (l == "[]"):
-            raise IncorrectInputDataException
-        #format this to be a json list
-        new = "[{"+"},\n{".join(l)+"}]"
-
-        #transform this list into a pandas dataframe
-        self._data = pd.read_json(new)
-        self._size = None
+        super().__init__(self, data)
 
 
-    def size(self):
-        """Methods that lazy loads the size of the dataset"""
-        if self._size == None:
-            # faster than self._data.shape[0]
-            self._size = len(self._data.index)
-        return self._size
-
-    def get_item(self, index):
-        """Methods that retrieves an item at a given index"""
-        if (index <= 0 or index >= self._data.shape[0]):
-            raise IndexError("Provided index is out of bound")
-        return self._data.iloc[index,:]
+    def _view_by(self, column):
+        pass
 
     class Test(UnitTest):
 
@@ -49,15 +22,9 @@ class IssuuDataset(AbstractDataset):
             {   "ts": 1393631989,    "visitor_uuid": "64bf70296da2f9fd",    "visitor_username": null,    "visitor_source": "internal",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0",    "visitor_ip": "06f49269e749a837",    "visitor_country": "VE",    "visitor_referrer": "64f729926497515c",    "env_type": "reader",    "env_doc_id": "130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb",    "env_adid": null,    "event_type": "pagereadtime",    "event_readtime": 797,    "subject_type": "doc",    "subject_doc_id": "130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb",    "subject_page": 10,    "cause": null }
         """
 
-        def test_dataset_size(self):
-            """Tests the case of a non existing file or None string passed"""
-            print("IssuuDataset.size")
-            
-            UnitTest.affirm(False)
 
-if __name__ == "__main__":
-    test = IssuuDataset.Test()
-    attrs = (getattr(test, name) for name in dir(test))
-    methods = filter(inspect.ismethod, attrs)
-    for method in methods:
-        method()
+
+        def test_view_by():
+            pass
+        
+        
