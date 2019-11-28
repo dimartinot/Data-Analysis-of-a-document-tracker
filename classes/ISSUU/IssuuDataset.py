@@ -49,3 +49,7 @@ class IssuuDataset(AbstractDataset):
             row_dict = row.dropna().to_dict()
             return row_dict
         return self._data.iloc[index,:]
+
+    def as_dataframe(self):
+        """Returns its Pandas DataFrame component"""
+        return self._data
