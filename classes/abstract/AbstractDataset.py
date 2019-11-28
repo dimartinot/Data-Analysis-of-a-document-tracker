@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 
 class AbstractDataset(ABC):
+    """Abstract class to inherit from when creating a new type of dataset"""
 
     def __init__(self):
         super().__init__()

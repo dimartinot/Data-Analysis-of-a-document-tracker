@@ -1,14 +1,91 @@
-# UnitTesting/UnitTest.py
+# libraries import
+import os
+import random
+import string
+import inspect
+import unittest
+import json
+
+# local files import
+from classes.abstract.AbstractDataset import AbstractDataset
+from classes.exception.NotFoundFileException import NotFoundFileException
+from classes.exception.IncorrectInputDataException import IncorrectInputDataException
+from classes.ISSUU.IssuuFactory import IssuuFactory
+from classes.ISSUU.IssuuDataset import IssuuDataset
+from classes.ISSUU.IssuuOperator import IssuuOperator
+
 # The basic unit testing class
 
-class UnitTest():
-    testID = ""
-    errors = []
-    # Override cleanup() if test object creation allocates non-memory
-    # resources that must be cleaned up:
-    def cleanup(self): pass
-    # Verify a condition is true:
-    @staticmethod
-    def affirm(condition):
-        if(not condition):
-            UnitTest.errors.append("failed: " + UnitTest.testID)
+class UnitTest(unittest.TestCase):
+
+    factory = IssuuFactory()
+
+    file_content = """
+        {   "ts": 1393631989,    "visitor_uuid": "745409913574d4c6",    "visitor_username": null,    "visitor_source": "external",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]",    "visitor_ip": "0e1c9cd3d6c22c65",    "visitor_country": "MX",    "visitor_referrer": "ab11264107143c5f",    "env_type": "reader",    "env_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0",    "env_adid": null,    "event_type": "impression",    "subject_type": "doc",    "subject_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0",    "subject_page": 23,    "cause_type": "page" }
+        {   "ts": 1393631990,    "visitor_uuid": "9a83c97f415601a6",    "visitor_username": null,    "visitor_source": "external",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (Windows NT 5.1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/31.0.1650.63 Safari/537.36",    "visitor_ip": "03a2602450304bd4",    "visitor_country": "AR",    "visitor_referrer": "0aefac0a2bd221ab",    "env_type": "reader",    "env_doc_id": "131203154832-9b8594b7ec211f7e1a0782fd9883a42c",    "env_adid": null,    "event_type": "read",    "subject_type": "doc",    "subject_doc_id": "131203154832-9b8594b7ec211f7e1a0782fd9883a42c",    "subject_page": 0,    "cause": null }
+        {   "ts": 1393631989,    "visitor_uuid": "745409913574d4c6",    "visitor_username": null,    "visitor_source": "external",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]",    "visitor_ip": "0e1c9cd3d6c22c65",    "visitor_country": "MX",    "visitor_referrer": "ab11264107143c5f",    "env_type": "reader",    "env_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0",    "env_adid": null,    "event_type": "pageread",    "subject_type": "doc",    "subject_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0",    "subject_page": 23,    "cause": null }
+        {   "ts": 1393631989,    "visitor_uuid": "64bf70296da2f9fd",    "visitor_username": null,    "visitor_source": "internal",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:27.0) Gecko/20100101 Firefox/27.0",    "visitor_ip": "06f49269e749a837",    "visitor_country": "VE",    "visitor_referrer": "64f729926497515c",    "env_type": "reader",    "env_doc_id": "130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb",    "env_adid": null,    "event_type": "pagereadtime",    "event_readtime": 797,    "subject_type": "doc",    "subject_doc_id": "130705172251-3a2a725b2bbd5aa3f2af810acf0aeabb",    "subject_page": 10,    "cause": null }
+    """
+
+    def test_load_dataset_not_existing_file(self):
+        """Tests the case of a non existing file or None string"""
+        # Generates a random filename of size 10
+        random_name = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])+".json"
+        with self.assertRaises(NotFoundFileException):
+            self.factory.load_dataset(path=random_name)
+    
+    def test_load_dataset_from_gibberish_string(self):
+        """Tests the load of a dataset from a faulty string"""
+        # Generates a random string of size 10
+        random_content = ''.join([random.choice(string.ascii_letters + string.digits) for n in range(10)])
+        with self.assertRaises(IncorrectInputDataException):
+            self.factory.load_dataset(content=random_content)
+
+    def test_load_dataset_from_empty_string(self):
+        """Tests the load of a dataset from a faulty string"""
+        # Generates a random string of size 10
+        content = ''
+        with self.assertRaises(IncorrectInputDataException):
+            self.factory.load_dataset(content=content)
+
+    def test_load_dataset_from_correct_string(self):
+        """Tests the load of a dataset from a correct string"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        third_dict = json.loads("""{"ts": 1393631989, "visitor_uuid": "745409913574d4c6", "visitor_source": "external", "visitor_device": "browser", "visitor_useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]", "visitor_ip": "0e1c9cd3d6c22c65", "visitor_country": "MX", "visitor_referrer": "ab11264107143c5f", "env_type": "reader", "env_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "event_type": "pageread", "subject_type": "doc", "subject_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "subject_page": 23}""")
+
+
+        self.assertDictEqual(third_dict,dataset.get_item(2, as_dict=True))
+
+    def test_dataset_size(self):
+        """Tests the case of a non existing file or None string passed"""  
+
+        dataset = self.factory.load_dataset(content=self.file_content)
+
+        self.assertEqual(dataset.size(), 4, "Dataset is sized as expected")
+
+    def test_dataset_get_item_negative_out_of_bound(self):
+        """Tests the case of an out of bound index (< 0)"""
+
+        dataset = self.factory.load_dataset(content=self.file_content)
+
+        with (self.assertRaises(IndexError)):
+            dataset.get_item(-1)
+    
+    def test_dataset_get_item_out_of_upper_bound(self):
+        """Tests the case of an out of bound index (>= size)"""
+
+        dataset = self.factory.load_dataset(content=self.file_content)
+
+        with (self.assertRaises(IndexError)):
+            dataset.get_item(-1)
+
+    def test_dataset_get_item(self):
+        """Tests the load of a dataset from a correct string"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        first_dict = json.loads("""{"ts": 1393631989, "visitor_uuid": "745409913574d4c6", "visitor_source": "external", "visitor_device": "browser", "visitor_useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]", "visitor_ip": "0e1c9cd3d6c22c65", "visitor_country": "MX", "visitor_referrer": "ab11264107143c5f", "env_type": "reader", "env_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "event_type": "impression", "subject_type": "doc", "subject_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", "subject_page": 23, "cause_type": "page"}""")
+
+        self.assertDictEqual(first_dict,dataset.get_item(0, as_dict=True))
+
+    def test_view_by(self):
+        """Tests view by"""
+        self.assertTrue(False)
