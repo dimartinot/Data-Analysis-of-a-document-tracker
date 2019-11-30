@@ -1,0 +1,22 @@
+// Also-Likes
+digraph {
+	node [shape=box]
+	beef [color=forestgreen fillcolor=forestgreen style=filled]
+	fbfb
+	f4ef
+	node [shape=ellipse]
+	adbe [color=forestgreen fillcolor=forestgreen style=filled]
+	ed25
+	c83b
+	"227f"
+	c90c
+	ecbe
+	beef -> adbe
+	fbfb -> adbe
+	fbfb -> ed25
+	fbfb -> c83b
+	fbfb -> "227f"
+	fbfb -> c90c
+	f4ef -> ecbe
+	f4ef -> adbe
+}

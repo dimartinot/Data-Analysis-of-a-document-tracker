@@ -8,8 +8,12 @@ import mmap
 
 #local file imports
 from classes.abstract.AbstractFactory import AbstractFactory
+from classes.abstract.AbstractDataset import AbstractDataset
+
 from classes.exception.NotFoundFileException import NotFoundFileException
 from classes.exception.IncorrectInputDataException import IncorrectInputDataException
+from classes.exception.IncorrectDatasetInstanceException import IncorrectDatasetInstanceException
+
 from classes.ISSUU.IssuuDataset import IssuuDataset
 from classes.ISSUU.IssuuOperator import IssuuOperator
 
@@ -66,4 +70,13 @@ class IssuuFactory(AbstractFactory):
             return self._load_dataset_from_string(content)   
 
     def get_operator(self, dataset):
-        return IssuuOperator(dataset)
+        """Public method that loads a correctly instantiated Operator"""
+        if (isinstance(dataset, IssuuDataset)):
+            return IssuuOperator(dataset)
+        elif (isinstance(dataset, AbstractDataset)):
+            # Error raised in the case the passed variable is of dataset type but not the instance of the Issuu dataset family
+            raise IncorrectDatasetInstanceException()
+        else:    
+            # Error raised if the input is not even a dataset
+            raise IncorrectInputDataException()
+            

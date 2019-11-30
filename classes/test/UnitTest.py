@@ -8,8 +8,10 @@ import json
 
 # local files import
 from classes.abstract.AbstractDataset import AbstractDataset
+from classes.abstract.AbstractOperator import AbstractOperator
 from classes.exception.NotFoundFileException import NotFoundFileException
 from classes.exception.IncorrectInputDataException import IncorrectInputDataException
+from classes.exception.IncorrectDatasetInstanceException import IncorrectDatasetInstanceException
 from classes.ISSUU.IssuuFactory import IssuuFactory
 from classes.ISSUU.IssuuDataset import IssuuDataset
 from classes.ISSUU.IssuuOperator import IssuuOperator
@@ -56,6 +58,21 @@ class UnitTest(unittest.TestCase):
 
         self.assertDictEqual(third_dict,dataset.get_item(2, as_dict=True))
 
+    def test_get_operator_none(self):
+        """Tests the loading of an operator when given None argument"""
+        with self.assertRaises(IncorrectInputDataException):
+            self.factory.get_operator(None)
+
+    def test_get_operator_wrong_type(self):
+        """Tests the loading of an operator when given wrongly typed argument"""
+        with self.assertRaises(IncorrectInputDataException):
+            self.factory.get_operator(5)
+    
+    def test_get_operator(self):
+        """Tests the correct loading of an operator"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        self.assertTrue(isinstance(self.factory.get_operator(dataset), AbstractOperator))
+
     def test_dataset_size(self):
         """Tests the case of a non existing file or None string passed"""  
 
@@ -86,6 +103,82 @@ class UnitTest(unittest.TestCase):
 
         self.assertDictEqual(first_dict,dataset.get_item(0, as_dict=True))
 
-    def test_view_by(self):
-        """Tests view by"""
-        self.assertTrue(False)
+    def test_view_by_browser_not_simplified(self):
+        """Tests view by browser"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+
+        val_count = operator.view_by_browser(plot=False)
+
+        self.assertEqual(val_count[0], 2)
+        self.assertEqual(val_count.size, 3)
+        self.assertEqual(val_count.keys()[0],
+        "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]")
+
+    def test_view_by_browser_simplified(self):
+        """Tests view by browser with simplified data"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.view_by_browser(simplified=True, plot=False)
+
+        self.assertEqual(val_count[0], 4)
+        self.assertEqual(val_count.size, 1)
+        self.assertEqual(val_count.keys()[0], "Mozilla")
+
+    def test_view_by_country_unexisting_doc_code(self):
+        """Tests view by country with non existing document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.view_by_country(doc_id="schmilblick", plot=False)
+
+        self.assertEqual(val_count.size, 0)
+    
+    def test_view_by_country_none_doc_code(self):
+        """Tests view by country with None document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        with self.assertRaises(IncorrectInputDataException):
+            _ = operator.view_by_country(doc_id=None, plot=False)
+
+    def test_view_by_country_existing_doc_code(self):
+        """Tests view by country with existing document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.view_by_country(doc_id="140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", plot=False)
+
+        self.assertEqual(val_count[0], 2)
+        self.assertEqual(val_count.size, 1)
+        self.assertEqual(val_count.keys()[0], "MX")
+
+    def test_view_by_continent_unexisting_doc_code(self):
+        """Tests view by country with non existing document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.view_by_continent(doc_id="schmilblick", plot=False)
+
+        self.assertEqual(val_count.size, 0)
+    
+    def test_view_by_continent_none_doc_code(self):
+        """Tests view by country with None document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        with self.assertRaises(IncorrectInputDataException):
+            _ = operator.view_by_continent(doc_id=None, plot=False)
+
+    def test_view_by_continent_existing_doc_code(self):
+        """Tests view by country with existing document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.view_by_continent(doc_id="140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", plot=False)
+
+        self.assertEqual(val_count[0], 2)
+        self.assertEqual(val_count.size, 1)
+        self.assertEqual(val_count.keys()[0], "NA")
+

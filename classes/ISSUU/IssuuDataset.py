@@ -24,6 +24,8 @@ class IssuuDataset(AbstractDataset):
         #format this to be a json list
         new = "[{"+"},\n{".join(l)+"}]"
 
+        print(len(l))
+
         #transform this list into a pandas dataframe
         try:
             self._data = pd.read_json(new)

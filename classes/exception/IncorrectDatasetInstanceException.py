@@ -1,0 +1,2 @@
+class IncorrectDatasetInstanceException(Exception):
+    pass

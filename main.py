@@ -37,15 +37,24 @@ if __name__ == "__main__":
     print("Operator loaded..")
 
     if (args["task_id"] == '2a'):
-        pass
+        if (args["doc_uuid"] is not None):
+            op.view_by_country(args["doc_uuid"])
+        else:
+            print("Document ID parameter missing.. Interrupting execution")
     elif (args["task_id"] == '2b'):
-        pass
+        if (args["doc_uuid"] is not None):
+            op.view_by_continent(args["doc_uuid"])
+        else:
+            print("Document ID parameter missing.. Interrupting execution")
     elif (args['task_id'] == '3a'):
         op.view_by_browser()
     elif (args["task_id"] == "3b"):
         op.view_by_browser(simplified=True)
     elif (args["task_id"] == "4d"):
-        pass
+        if (args["doc_uuid"] is not None):
+            op.also_likes(args["doc_uuid"], args["user_uuid"])
+        else:
+            print("Document ID / User ID parameter missing.. Interrupting execution")
     elif (args["task_id"] == "5"):
         pass
     elif (args["task_id"] == "6"):
