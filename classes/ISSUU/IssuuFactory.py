@@ -3,19 +3,20 @@ import os
 import random
 import string
 import inspect
-from multiprocessing import Pool
-import mmap
 
 #local file imports
 from classes.abstract.AbstractFactory import AbstractFactory
 from classes.abstract.AbstractDataset import AbstractDataset
+from classes.abstract.AbstractOperator import AbstractOperator
 
 from classes.exception.NotFoundFileException import NotFoundFileException
 from classes.exception.IncorrectInputDataException import IncorrectInputDataException
 from classes.exception.IncorrectDatasetInstanceException import IncorrectDatasetInstanceException
+from classes.exception.IncorrectOperatorInstanceException import IncorrectOperatorInstanceException
 
 from classes.ISSUU.IssuuDataset import IssuuDataset
 from classes.ISSUU.IssuuOperator import IssuuOperator
+from classes.ISSUU.IssuuGUI import IssuuGUI
 
 def join_list_str(x):
     return ''.join(str(x))
@@ -45,9 +46,7 @@ class IssuuFactory(AbstractFactory):
             f.close()
             str_content = ''.join(res)
 
-            #pool = Pool(os.cpu_count() - 1)
-
-            return IssuuDataset(str_content)
+            return IssuuDataset(str_content, path)
         else:
             raise NotFoundFileException()
 
@@ -80,3 +79,11 @@ class IssuuFactory(AbstractFactory):
             # Error raised if the input is not even a dataset
             raise IncorrectInputDataException()
             
+    def launch_GUI(self, operator, doc_uid = None, user_uid = None):
+        """Public method that loads the GUI"""
+        if (isinstance(operator, IssuuOperator)):
+            return IssuuGUI(operator, doc_uid, user_uid)
+        elif (isinstance(operator, AbstractOperator)):
+            raise IncorrectOperatorInstanceException()
+        else:
+            raise IncorrectInputDataException()

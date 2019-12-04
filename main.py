@@ -52,12 +52,17 @@ if __name__ == "__main__":
         op.view_by_browser(simplified=True)
     elif (args["task_id"] == "4d"):
         if (args["doc_uuid"] is not None):
-            op.also_likes(args["doc_uuid"], args["user_uuid"])
+            print(op.also_likes(args["doc_uuid"], args["user_uuid"], plot=False))
         else:
-            print("Document ID / User ID parameter missing.. Interrupting execution")
+            print("Document ID parameter missing.. Interrupting execution")
     elif (args["task_id"] == "5"):
-        pass
+        if (args["doc_uuid"] is not None):
+            op.also_likes(args["doc_uuid"], args["user_uuid"], plot=True)
+        else:
+            print("Document ID parameter missing.. Interrupting execution")
     elif (args["task_id"] == "6"):
-        pass
+        gui = f.launch_GUI(op, args["doc_uuid"], args["user_uuid"])
+        print("Loading gui..")
+        gui.show()
     else:
         raise UnknownInputException()

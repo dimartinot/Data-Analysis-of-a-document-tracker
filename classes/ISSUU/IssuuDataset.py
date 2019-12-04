@@ -4,6 +4,9 @@ import inspect
 import re
 import unittest
 import numpy as np
+from joblib import Parallel, delayed
+import multiprocessing
+import json
 
 # local files import
 from classes.abstract.AbstractDataset import AbstractDataset
@@ -12,27 +15,40 @@ from classes.exception.IncorrectInputDataException import IncorrectInputDataExce
 class IssuuDataset(AbstractDataset):
     """Holds the data of an Issuu-syntaxed dataset"""
 
-    def __init__(self, data):
+    def __init__(self, data, filepath="<No Path>"):
         """data is expected to be a string"""
         assert(type(data) == str)
+        assert(type(filepath) == str)
 
+        self.filepath = filepath
+
+        #print("Launching regular expression..")
         #Regular expression to transform the data as a list of json 
         l = re.findall(r"{(.*)}"
                 ,data)
         if (l == []):
             raise IncorrectInputDataException()
         #format this to be a json list
-        new = "[{"+"},\n{".join(l)+"}]"
 
-        print(len(l))
+        #print("Json creations expression..")
+        n_jobs = multiprocessing.cpu_count() - 1 # leaving 1 cpu out for system
 
+        res_holder = np.zeros((n_jobs, ))
+
+        pool = multiprocessing.Pool(processes=n_jobs)
+
+        l = pool.map(convert_json, l)
+
+        #print("Creating DataFrame")
         #transform this list into a pandas dataframe
         try:
-            self._data = pd.read_json(new)
+            self._data = pd.DataFrame.from_records(l)
         except:
             raise IncorrectInputDataException()
         self._size = None
 
+    def get_path(self):
+        return self.filepath
 
     def size(self):
         """Methods that lazy loads the size of the dataset"""
@@ -55,3 +71,6 @@ class IssuuDataset(AbstractDataset):
     def as_dataframe(self):
         """Returns its Pandas DataFrame component"""
         return self._data
+
+def convert_json(s):
+    return json.loads("{"+s+"}")

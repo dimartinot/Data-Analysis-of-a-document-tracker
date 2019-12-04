@@ -1,1 +1,1 @@
-python main.py -f sample_3m_lines.json -t 4d -d 140109173556-a4b921ab7619621709b098aa9de4d736
+python main.py -f sample_100k_lines.json -t 6 -d aaaaaaaaaaaa-00000000df1ad06a86c40000000feadbe -u 00000000deadbeef

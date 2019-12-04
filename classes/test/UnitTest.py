@@ -5,10 +5,12 @@ import string
 import inspect
 import unittest
 import json
+import numpy as np
 
 # local files import
 from classes.abstract.AbstractDataset import AbstractDataset
 from classes.abstract.AbstractOperator import AbstractOperator
+from classes.abstract.AbstractGUI import AbstractGUI
 from classes.exception.NotFoundFileException import NotFoundFileException
 from classes.exception.IncorrectInputDataException import IncorrectInputDataException
 from classes.exception.IncorrectDatasetInstanceException import IncorrectDatasetInstanceException
@@ -182,3 +184,63 @@ class UnitTest(unittest.TestCase):
         self.assertEqual(val_count.size, 1)
         self.assertEqual(val_count.keys()[0], "NA")
 
+    def test_also_likes_unexisting_doc_code(self):
+        """Tests also likes functionality with non existing document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.also_likes(doc_id="schmilblick", plot=False)
+
+        self.assertEqual(type(val_count), np.ndarray)
+        self.assertEqual(val_count.size, 0)
+
+    def test_also_likes_none_doc_code(self):
+        """Tests also likes functionality with None document code"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        
+        with self.assertRaises(IncorrectInputDataException):
+            _ = operator.also_likes(doc_id=None, plot=False)
+
+    def test_also_likes_existing_doc_code(self):
+        """Tests also likes functionality with existing document code"""
+        file_content_up = self.file_content +"""
+                {   "ts": 1393631989,    "visitor_uuid": "745409913574d4c6",    "visitor_username": null,    "visitor_source": "external",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]",    "visitor_ip": "0e1c9cd3d6c22c65",    "visitor_country": "MX",    "visitor_referrer": "ab11264107143c5f",    "env_type": "reader",    "env_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0",    "env_adid": null,    "event_type": "pageread",    "subject_type": "doc",    "subject_doc_id": "130325130327-d5889c2cf2e642b6867cb9005e12297f",    "subject_page": 23,    "cause": null }
+        """
+        dataset = self.factory.load_dataset(content=file_content_up)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.also_likes(doc_id="140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", plot=False)
+
+        self.assertEqual(type(val_count), np.ndarray)
+        self.assertEqual(val_count.size, 1)
+        self.assertEqual(val_count[0], "130325130327-d5889c2cf2e642b6867cb9005e12297f")
+
+    def test_also_likes_existing_doc_code_nonexisting_user(self):
+        """Tests also likes functionality with existing document code and unknown user id"""
+        file_content_up = self.file_content +"""
+                {   "ts": 1393631989,    "visitor_uuid": "745409913574d4c6",    "visitor_username": null,    "visitor_source": "external",    "visitor_device": "browser",    "visitor_useragent": "Mozilla/5.0 (iPhone; CPU iPhone OS 7_0_6 like Mac OS X) AppleWebKit/537.51.1 (KHTML, like Gecko) Mobile/11B651 [FBAN/FBIOS;FBAV/7.0.0.17.1;FBBV/1325030;FBDV/iPhone4,1;FBMD/iPhone;FBSN/iPhone OS;FBSV/7.0.6;FBSS/2; FBCR/Telcel;FBID/phone;FBLC/es_ES;FBOP/5]",    "visitor_ip": "0e1c9cd3d6c22c65",    "visitor_country": "MX",    "visitor_referrer": "ab11264107143c5f",    "env_type": "reader",    "env_doc_id": "140228202800-6ef39a241f35301a9a42cd0ed21e5fb0",    "env_adid": null,    "event_type": "pageread",    "subject_type": "doc",    "subject_doc_id": "130325130327-d5889c2cf2e642b6867cb9005e12297f",    "subject_page": 23,    "cause": null }
+        """
+        dataset = self.factory.load_dataset(content=file_content_up)
+        operator = self.factory.get_operator(dataset)
+        
+        val_count = operator.also_likes(doc_id="140228202800-6ef39a241f35301a9a42cd0ed21e5fb0", user_id="schmilblick", plot=False)
+
+        self.assertEqual(type(val_count), np.ndarray)
+        self.assertEqual(val_count.size, 1)
+
+    def test_launch_gui_none(self):
+        """Tests the loading of the GUI when given None argument"""
+        with self.assertRaises(IncorrectInputDataException):
+            self.factory.launch_GUI(None)
+
+    def test_launch_gui_wrong_type(self):
+        """Tests the launch of the GUI when given wrongly typed argument"""
+        with self.assertRaises(IncorrectInputDataException):
+            self.factory.launch_GUI(5)
+    
+    def test_launch_gui(self):
+        """Tests the correct loading of the GUI"""
+        dataset = self.factory.load_dataset(content=self.file_content)
+        operator = self.factory.get_operator(dataset)
+        self.assertTrue(isinstance(self.factory.launch_GUI(operator), AbstractGUI))
