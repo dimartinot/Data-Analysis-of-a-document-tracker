@@ -4,7 +4,6 @@ import inspect
 import re
 import unittest
 import numpy as np
-from joblib import Parallel, delayed
 import multiprocessing
 import json
 
@@ -39,10 +38,13 @@ class IssuuDataset(AbstractDataset):
 
         l = pool.map(convert_json, l)
 
+        #new = "[{"+"},\n{".join(l)+"}]"
+
         #print("Creating DataFrame")
         #transform this list into a pandas dataframe
         try:
             self._data = pd.DataFrame.from_records(l)
+            #self._data = pd.read_json(new)
         except:
             raise IncorrectInputDataException()
         self._size = None

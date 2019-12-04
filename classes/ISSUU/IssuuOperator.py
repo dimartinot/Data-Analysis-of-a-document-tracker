@@ -221,12 +221,12 @@ class IssuuOperator(AbstractOperator):
 
                 print("saving to dot format..")
                 also_likes_graph.save("also_likes.dot")
-                print("converting dot format to .ps..")
+                print("converting dot format to image..")
                 # system call to the executable
 
                 if (platform.system() == "Windows"):
                     executable_path = os.path.join(os.getcwd(), self._GRAPHVIZ_W_BIN_PATH)
-                    os.system(f"{os.path.join(executable_path,'dot.exe')} -Tps -o also_likes.ps also_likes.dot")
+                    os.system(f"{os.path.join(executable_path,'dot.exe')} -Tjpeg -o also_likes.jpeg also_likes.dot")
                 else:
                     # We expect Graphviz to be installed. If not, use 'sudo apt-get install graphviz'
                     also_likes_graph.render("also_likes.ps")

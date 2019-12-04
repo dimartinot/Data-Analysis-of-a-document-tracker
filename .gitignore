@@ -125,3 +125,7 @@ dmypy.json
 .pyre/
 
 *.json
+
+/build
+/dist
+/bin/Python

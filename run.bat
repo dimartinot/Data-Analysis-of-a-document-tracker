@@ -1,1 +1,1 @@
-python main.py -f sample_100k_lines.json -t 6 -d aaaaaaaaaaaa-00000000df1ad06a86c40000000feadbe -u 00000000deadbeef
+cw2.bat -f sample_3m_lines.json -t 5 -d 140213232558-bdd53a3a2ae91f2c5f951187668edd50

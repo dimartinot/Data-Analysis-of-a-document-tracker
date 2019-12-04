@@ -19,7 +19,17 @@ if __name__ == "__main__":
     help="Input for the document UUID")
 
     ap.add_argument("-t", "--task_id", required=True, choices=['2a', '2b', '3a', '3b', '4d', '5', '6'],
-    help="Input for the task_id. Can take value in (2a, 2b, 3a, 3b, 4d, 5, 6)")
+    help="""
+    Input for the task_id. Can take value in (2a, 2b, 3a, 3b, 4d, 5, 6) where:
+     - 2a: Opens an horizontal bar chart of the count of document views by country
+     - 2b: Opens an horizontal bar chart of the count of document views by continent
+     - 3a: Opens an horizontal bar chart of the count of document views by browser with raw names
+     - 3b: Opens an horizontal bar chart of the count of document views by browser with cleaned names
+     - 4d: Generates an also-like list from the doc_id and user_id (optional)
+     - 5:  Generates an also-likes graph from the doc_id and user_id (optional)
+     - 6:  launches the GUI
+    
+    """)
 
     ap.add_argument("-f", "--filename", required=True,
     help="Input for the name of the JSON file database")
