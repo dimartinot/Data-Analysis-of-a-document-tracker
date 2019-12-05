@@ -22,11 +22,16 @@ class IssuuOperator(AbstractOperator):
         super().__init__(data)
 
     def doc_id_exists(self, doc_id):
-        """Returns true of doc id is found in the dataset"""
+        """Returns true if doc id is found in the dataset"""
         df = self._get_dataframe()
         col = df[(df['subject_type'] == 'doc') & (df['subject_doc_id'] == doc_id)]['visitor_country']
         return (col.empty == False)
-        
+
+    def user_id_exists(self, user_id):
+        """Returns true if user id is found in the dataset"""
+        df = self._get_dataframe()
+        col = df[df['visitor_uuid'] == user_id]['visitor_country']
+        return (col.empty == False)
 
     def _get_dataframe(self):
         """Retrieves a value count from a given column of the dataset"""
@@ -84,7 +89,8 @@ class IssuuOperator(AbstractOperator):
         if (simplified):
             val_count = column.apply(lambda string: string.split("/")[0] if (type(string)==str) else None).value_counts()
         else:
-            val_count = column.value_counts()
+            # we keep the 20 best
+            val_count = column.value_counts()[:20]
 
         if (plot):
             self._plot_frequency_table(
@@ -157,11 +163,16 @@ class IssuuOperator(AbstractOperator):
         if (doc_id is None):
             raise IncorrectInputDataException()
 
+
+
         visitors = self._readers_of(doc_id)
 
         # Not to output the documents read by the current user
         if user_id is not None:
-            visitors = visitors[visitors["visitor_uuid"] != user_id]
+            if self.user_id_exists(user_id) == False:
+                user_id = None
+            else:
+                visitors = visitors[visitors["visitor_uuid"] != user_id]
 
         # There is a high probability of finding duplicates as documents read by similar visitors tend to be the same        
         visitors["docs"] = visitors["visitor_uuid"].apply(lambda vis_id: self._has_read(vis_id).values.flatten())
@@ -194,7 +205,7 @@ class IssuuOperator(AbstractOperator):
                     also_likes_graph.node(user_id[-4:], style="filled", fillcolor="forestgreen", color="forestgreen")
 
                 for user in visitors["visitor_uuid"]:
-                        also_likes_graph.node(user[-4:])
+                    also_likes_graph.node(user[-4:])
 
                 # Then adding the docs
                 also_likes_graph.attr('node', shape="ellipse")

@@ -78,7 +78,7 @@ class IssuuGUI(AbstractGUI):
             {"text": "View by Browser (dirty)", 'action': lambda : view_by_browser(pretty=False)},
             {"text": "View by Browser (clean)", 'action': lambda : view_by_browser(pretty=True)},
             {"text": "Also-Likes list", 'action': lambda : also_likes(self.str_var_doc_uid.get(), self.str_var_user_uid.get(), graph=False)},
-            {"text": "Also-Likes graph", 'action': lambda : also_likes(self.str_var_doc_uid.get(), self.str_var_user_uid.get(), graph=False)},
+            {"text": "Also-Likes graph", 'action': lambda : also_likes(self.str_var_doc_uid.get(), self.str_var_user_uid.get(), graph=True)},
         ]
 
         labels_input = [
