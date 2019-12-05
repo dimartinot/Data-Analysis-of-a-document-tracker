@@ -54,7 +54,7 @@ class IssuuGUI(AbstractGUI):
             if self.operator.doc_id_exists(doc_id):
                 res = self.operator.also_likes(doc_id, user_uid, plot=graph)
                 if (graph):
-                    self._open_error_popup("Graph generated in file 'also_like.ps'",title="Graph Generated")
+                    self._open_error_popup("Graph generated in file 'also_like.jpeg'",title="Graph Generated")
                 else:
                     text = ""
                     for i, line in enumerate(res):

@@ -32,6 +32,9 @@ class IssuuDataset(AbstractDataset):
         #print("Json creations expression..")
         n_jobs = multiprocessing.cpu_count() - 1 # leaving 1 cpu out for system
 
+        if n_jobs < 1:
+            n_jobs = 1
+
         res_holder = np.zeros((n_jobs, ))
 
         pool = multiprocessing.Pool(processes=n_jobs)

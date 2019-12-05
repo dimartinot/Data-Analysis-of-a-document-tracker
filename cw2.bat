@@ -1,1 +1,1 @@
-python main.py %*
+python cw2.py %*
