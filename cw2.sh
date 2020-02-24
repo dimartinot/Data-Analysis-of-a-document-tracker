@@ -1,3 +1,3 @@
 #!/bin/bash 
 
-bin/Python/python.exe main.py $@
+python cw2.py $@

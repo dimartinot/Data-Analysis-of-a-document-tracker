@@ -1,1 +1,1 @@
-cw2.bat -f sample_3m_lines.json -t 5 -d 140213232558-bdd53a3a2ae91f2c5f951187668edd50
+python cw2.py -f sample_100k_lines.json -t 6 -d 100806162735-00000000115598650cb8b514246272b5
